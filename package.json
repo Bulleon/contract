@@ -1,0 +1,50 @@
+{
+  "name": "bulleon-contracts",
+  "version": "2.0.0",
+  "description": "Smart-contracts of Bulleon Project",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "1.9.0",
+    "truffle": "^4.1.5",
+    "truffle-hdwallet-provider": "0.0.5"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.1",
+    "dotenv": "^5.0.1",
+    "ganache-cli": "^6.1.0",
+    "solium": "^1.1.7"
+  },
+  "scripts": {
+    "test": "scripts/test.sh",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
+    "lint:all": "npm run lint && npm run lint:sol",
+    "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
+    "console": "truffle console",
+    "coverage": "scripts/coverage.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bulleon/contract.git"
+  },
+  "keywords": [
+    "bulleon",
+    "erc20",
+    "crowdsale",
+    "smart-contracts",
+    "solidity",
+    "ethereum",
+    "ico"
+  ],
+  "author": "decodedbrain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bulleon/contract/issues"
+  },
+  "homepage": "https://github.com/Bulleon/contract#readme"
+}
