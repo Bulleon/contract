@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "./BulleonToken.sol";
 
-contract BulleonMultitransfer is Claimable {
+contract Multitransfer is Claimable {
     address public BulleonAddress;
     address public sender;
     BulleonToken bulleon;

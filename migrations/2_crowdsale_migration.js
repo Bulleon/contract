@@ -13,5 +13,5 @@ module.exports = async function (deployer, network) {
   CrowdsaleInstance = await Crowdsale.deployed();
 
   await TokenInstance.setCrowdsaleAddress(CrowdsaleInstance.address);
-  await deployer.deploy(Multitransfer, TokenInstance.address);
+  await deployer.deploy(Multitransfer, TokenInstance.address, web3.eth.coinbase);
 };
