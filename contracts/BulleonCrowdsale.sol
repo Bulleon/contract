@@ -7,6 +7,10 @@ import "./BulleonToken.sol"; /* Bulleon Token Contract */
 
 contract BulleonCrowdsale is Claimable {
     using SafeMath for uint256;
+    /* Additionals events */
+    event AddedToBlacklist(address wallet);
+    event RemovedFromBlacklist(address wallet);
+
     /* Infomational vars */
     string public name = "Bulleon Crowdsale";
     string public version = "2.0";
@@ -41,6 +45,7 @@ contract BulleonCrowdsale is Claimable {
       760000, // stage 9
       759000  // stage 10
     ];
+    mapping(address=>bool) isBlacklisted;
 
     /* ICO stats */
     uint256 public totalSold = 327986072304513072322000; // ! Update on publish
@@ -106,7 +111,7 @@ contract BulleonCrowdsale is Claimable {
      * @dev Main token puchase function
      */
     function buyTokens(address beneficiary) public payable {
-      bool validPurchase = beneficiary != 0x0 && msg.value != 0;
+      bool validPurchase = beneficiary != 0x0 && msg.value != 0 && !isBlacklisted[msg.sender];
       uint256 currentTokensAmount = availableTokens();
       // Check that ICO is Active and purchase tx is valid
       require(isActive() && validPurchase);
@@ -253,5 +258,17 @@ contract BulleonCrowdsale is Claimable {
       // Check that fund have tokens to transfer
       amountAtFund = fundAmount().sub(amount);
       rewardToken.transfer(beneficiary, amount);
+    }
+
+    function addBlacklist(address wallet) public onlyOwner {
+      require(!isBlacklisted[wallet]);
+      isBlacklisted[wallet] = true;
+      emit AddedToBlacklist(wallet);
+    }
+
+    function delBlacklist(address wallet) public onlyOwner {
+      require(isBlacklisted[wallet]);
+      isBlacklisted[wallet] = false;
+      emit RemovedFromBlacklist(wallet);
     }
 }
