@@ -9,12 +9,16 @@ interface CrowdsaleContract {
 }
 
 contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
+  /* Additional events */
+  event AddedToWhitelist(address wallet);
+  event RemoveWhitelist(address wallet);
 
   /* Base params */
   string public constant name = "Bulleon"; /* solium-disable-line uppercase */
   string public constant symbol = "BUL"; /* solium-disable-line uppercase */
   uint8 public constant decimals = 18; /* solium-disable-line uppercase */
   uint256 public constant totalSupply_ = 7970000 * (10 ** uint256(decimals));
+  uint256 constant exchangersBalance = 0;
 
   /* Premine and start balance settings */
   address public premineWallet = 0x286BE9799488cA4543399c2ec964e7184077711C;
@@ -29,9 +33,8 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
    * @dev Constructor that gives msg.sender all availabel of existing tokens.
    */
   constructor() public {
-    uint256 constant exchangersBalance = 0;
     balances[msg.sender] = totalSupply_;
-    transfer(premineWallet, premineAmount.add(exchangersBalance))
+    transfer(premineWallet, premineAmount.add(exchangersBalance));
 
     addToWhitelist(msg.sender);
     addToWhitelist(premineWallet);
@@ -77,6 +80,7 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
   function addToWhitelist(address wallet) public onlyOwner {
     require(!whitelist[wallet]);
     whitelist[wallet] = true;
+    emit AddedToWhitelist(wallet);
   }
 
   /**
@@ -85,5 +89,6 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
   function delWhitelist(address wallet) public onlyOwner {
     require(whitelist[wallet]);
     whitelist[wallet] = false;
+    emit RemoveWhitelist(wallet);
   }
 }
