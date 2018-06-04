@@ -1,15 +1,17 @@
 var
   Crowdsale = artifacts.require('./BulleonCrowdsale.sol'),
   Token = artifacts.require('./BulleonToken.sol'),
+  Multitransfer = artifacts.require('./Multitransfer.sol'),
   CrowdsaleInstance,
   TokenInstance;
 
 module.exports = async function (deployer, network) {
-  await deployer.deploy(Crowdsale);
+  await deployer.deploy(Token);
+  TokenInstance = await Token.deployed();
 
+  await deployer.deploy(Crowdsale, TokenInstance.address);
   CrowdsaleInstance = await Crowdsale.deployed();
 
-  await deployer.deploy(Token, CrowdsaleInstance.address);
-
-  await CrowdsaleInstance.attachToken(TokenInstance.address).sendTransaction();
+  await TokenInstance.setCrowdsaleAddress(CrowdsaleInstance.address);
+  await deployer.deploy(Multitransfer, TokenInstance.address);
 };
