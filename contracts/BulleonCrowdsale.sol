@@ -16,7 +16,7 @@ contract BulleonCrowdsale is Claimable {
     string public version = "2.0";
 
     /* ICO params */
-    address public withdrawWallet = 0x3c03f65569704346a4c78e1189Cb89F49057EccD;
+    address public withdrawWallet = 0xAd74Bd38911fE4C19c95D14b5733372c3978C2D9;
     uint256 public endDate = 1546300799; // Monday, 31-Dec-18 23:59:59 UTC
     BulleonToken public rewardToken;
     // Tokens rate (BUL / ETH) on stage
@@ -45,7 +45,7 @@ contract BulleonCrowdsale is Claimable {
       760000, // stage 9
       759000  // stage 10
     ];
-    mapping(address=>bool) isBlacklisted;
+    mapping(address=>bool) public isBlacklisted;
 
     /* ICO stats */
     uint256 public totalSold = 327986072304513072322000; // ! Update on publish

@@ -9,41 +9,48 @@ interface CrowdsaleContract {
 }
 
 contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
+
+  /* Base params */
   string public constant name = "Bulleon"; /* solium-disable-line uppercase */
   string public constant symbol = "BUL"; /* solium-disable-line uppercase */
   uint8 public constant decimals = 18; /* solium-disable-line uppercase */
+  uint256 public constant totalSupply_ = 7970000 * (10 ** uint256(decimals));
+
+  /* Premine and start balance settings */
+  address public premineWallet = 0x286BE9799488cA4543399c2ec964e7184077711C;
+  uint256 public premineAmount = 178420 * (10 ** uint256(decimals));
+
+  /* Additional params */
   address public CrowdsaleAddress;
   CrowdsaleContract crowdsale;
-  address public premineWallet = 0xA75E62874Cb25D53e563A269DF4b52d5A28e7A8e;
-  uint256 public premineAmount = 178420 * (10 ** uint256(decimals));
-  uint256 public constant totalSupply_ = 7970000 * (10 ** uint256(decimals));
   mapping(address=>bool) whitelist; // Users that may transfer tokens before ICO ended
 
   /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
+   * @dev Constructor that gives msg.sender all availabel of existing tokens.
    */
   constructor() public {
-    balances[msg.sender] = totalSupply_ - premineAmount;
-    balances[premineWallet] = premineAmount;
-    owner = msg.sender;
-    emit Transfer(0x0, msg.sender, totalSupply_ - premineAmount);
-    emit Transfer(0x0, premineWallet, premineAmount);
+    uint256 constant exchangersBalance = 0;
+    balances[msg.sender] = totalSupply_;
+    transfer(premineWallet, premineAmount.add(exchangersBalance))
+
     addToWhitelist(msg.sender);
-    addToWhitelist(0xA75E62874Cb25D53e563A269DF4b52d5A28e7A8e);
-    addToWhitelist(0x3c03f65569704346a4c78e1189Cb89F49057EccD);
+    addToWhitelist(premineWallet);
     paused = true; // Lock token at start
   }
 
+  /**
+   * @dev Sets crowdsale contract address (used for checking ICO status)
+   */
   function setCrowdsaleAddress(address _ico) public onlyOwner {
     CrowdsaleAddress = _ico;
     crowdsale = CrowdsaleContract(CrowdsaleAddress);
-    addToWhitelist(_ico);
+    addToWhitelist(CrowdsaleAddress);
   }
 
   /**
    * @dev called by user the to pause, triggers stopped state
    * not actualy used
-  */
+   */
   function pause() public {
   }
 
