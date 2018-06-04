@@ -1,6 +1,6 @@
 *.swp
 *.swo
-
+bin/*
 # Logs
 logs
 *.log
