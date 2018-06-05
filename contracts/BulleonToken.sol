@@ -54,7 +54,7 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
    * @dev called by user the to pause, triggers stopped state
    * not actualy used
    */
-  function pause() public {
+  function pause() onlyOwner whenNotPaused public {
   }
 
   /**

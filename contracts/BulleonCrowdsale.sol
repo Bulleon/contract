@@ -55,6 +55,7 @@ contract BulleonCrowdsale is Claimable {
     /* Bonus params */
     uint256 public bonus = 0;
     uint256 constant BONUS_COEFF = 1000; // Values should be 10x percents, value 1000 = 100%
+    mapping(address=>uint256) public investmentsOf; // Investments made by wallet
 
     /* Fund params */
     uint256 public amountAtFund = 1000000 * 1 ether; // ! Update un publish
@@ -95,7 +96,7 @@ contract BulleonCrowdsale is Claimable {
      * @dev Returns actual (base + bonus %) rate (BUL/ETH) of current stage.
      */
     function stageRate() public view returns(uint256) {
-      return stageBaseRate().mul(BONUS_COEFF.add(bonus)).div(BONUS_COEFF);
+      return stageBaseRate().mul(BONUS_COEFF.add(getBonus())).div(BONUS_COEFF);
     }
 
     constructor(address token) public {
@@ -123,7 +124,7 @@ contract BulleonCrowdsale is Claimable {
       uint256[2] memory tokensAndRefund = calcMultiStage();
       boughtTokens = tokensAndRefund[0];
       refundAmount = tokensAndRefund[1];
-
+      investmentsOf[msg.sender] = investmentsOf[msg.sender].add(msg.value);
       // Check that bought tokens amount less then current
       require(boughtTokens < currentTokensAmount);
 
@@ -240,7 +241,7 @@ contract BulleonCrowdsale is Claimable {
     function setBonus(uint256 bonusAmount) public onlyOwner {
       require(
         bonusAmount < 100 * BONUS_COEFF &&
-        bonusAmount > 0
+        bonusAmount >= 0
       );
       bonus = bonusAmount;
     }
@@ -258,6 +259,26 @@ contract BulleonCrowdsale is Claimable {
       // Check that fund have tokens to transfer
       amountAtFund = fundAmount().sub(amount);
       rewardToken.transfer(beneficiary, amount);
+    }
+
+    function getBonus() public view returns(uint256) {
+      uint256 _bonus = bonus;
+      if(investmentsOf[msg.sender] >= 50 ether)
+        _bonus = 500; // 50%
+      else
+      if(investmentsOf[msg.sender]  >= 20 ether)
+        _bonus = 200; // 20%
+      else
+      if(investmentsOf[msg.sender]  >= 10 ether)
+        _bonus = 150; // 15%
+      else
+      if(investmentsOf[msg.sender]  >= 5 ether)
+        _bonus = 100; // 10%
+      else
+      if(investmentsOf[msg.sender] >= 1 ether)
+        _bonus = 50; // 5%
+
+      return _bonus;
     }
 
     function addBlacklist(address wallet) public onlyOwner {
