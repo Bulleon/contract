@@ -67,10 +67,6 @@ contract BulleonCrowdsale is Claimable {
       return !(availableTokens() == 0 || now > endDate);
     }
 
-    function setEndDate(uint256 _newDate) public onlyOwner {
-      endDate = _newDate;
-    }
-
     /* ICO stats methods */
 
     /**
@@ -248,24 +244,24 @@ contract BulleonCrowdsale is Claimable {
       );
       bonus = bonusAmount;
     }
-    
+
     function getBonus() public view returns(uint256) {
       uint256 _bonus = bonus;
       uint256 investments = investmentsOf[msg.sender];
       if(investments >= 50 ether)
-        _bonus = 500; // 50%
+        _bonus += 250; // 25%
       else
       if(investments >= 20 ether)
-        _bonus = 200; // 20%
+        _bonus += 200; // 20%
       else
       if(investments  >= 10 ether)
-        _bonus = 150; // 15%
+        _bonus += 150; // 15%
       else
       if(investments  >= 5 ether)
-        _bonus = 100; // 10%
+        _bonus += 100; // 10%
       else
       if(investments >= 1 ether)
-        _bonus = 50; // 5%
+        _bonus += 50; // 5%
 
       return _bonus;
     }
