@@ -10,6 +10,7 @@ contract BulleonCrowdsale is Claimable {
     /* Additionals events */
     event AddedToBlacklist(address wallet);
     event RemovedFromBlacklist(address wallet);
+    event Log(uint256 value);
 
     /* Infomational vars */
     string public name = "Bulleon Crowdsale";
@@ -48,8 +49,8 @@ contract BulleonCrowdsale is Claimable {
     mapping(address=>bool) public isBlacklisted;
 
     /* ICO stats */
-    uint256 public totalSold = 327986072304513072322000; // ! Update on publish
-    uint256 public soldOnStage = 327986072304513072322000; // ! Update on publish
+    uint256 public totalSold = 329406072304513072322000; // ! Update on publish
+    uint256 public soldOnStage = 329406072304513072322000; // ! Update on publish
     uint8 public currentStage = 0;
 
     /* Bonus params */
@@ -57,9 +58,6 @@ contract BulleonCrowdsale is Claimable {
     uint256 constant BONUS_COEFF = 1000; // Values should be 10x percents, value 1000 = 100%
     mapping(address=>uint256) public investmentsOf; // Investments made by wallet
 
-    /* Fund params */
-    uint256 public amountAtFund = 1000000 * 1 ether; // ! Update un publish
-    uint256 public fundLifetime = now + 30 days;
 
 
    /**
@@ -67,6 +65,10 @@ contract BulleonCrowdsale is Claimable {
     */
     function isActive() public view returns (bool) {
       return !(availableTokens() == 0 || now > endDate);
+    }
+
+    function setEndDate(uint256 _newDate) public onlyOwner {
+      endDate = _newDate;
     }
 
     /* ICO stats methods */
@@ -82,7 +84,7 @@ contract BulleonCrowdsale is Claimable {
      * @dev Returns tokens amount available to sell at current stage.
      */
     function availableOnStage() public view returns(uint256) {
-        return stageCap().sub(soldOnStage);
+        return stageCap().sub(soldOnStage) > availableTokens() ? availableTokens() : stageCap().sub(soldOnStage);
     }
 
     /**
@@ -116,7 +118,7 @@ contract BulleonCrowdsale is Claimable {
       uint256 currentTokensAmount = availableTokens();
       // Check that ICO is Active and purchase tx is valid
       require(isActive() && validPurchase);
-
+      investmentsOf[msg.sender] = investmentsOf[msg.sender].add(msg.value);
       uint256 boughtTokens;
       uint256 refundAmount = 0;
 
@@ -124,9 +126,8 @@ contract BulleonCrowdsale is Claimable {
       uint256[2] memory tokensAndRefund = calcMultiStage();
       boughtTokens = tokensAndRefund[0];
       refundAmount = tokensAndRefund[1];
-      investmentsOf[msg.sender] = investmentsOf[msg.sender].add(msg.value);
       // Check that bought tokens amount less then current
-      require(boughtTokens < currentTokensAmount);
+      require(boughtTokens <= currentTokensAmount);
 
       totalSold = totalSold.add(boughtTokens); // Increase stats variable
 
@@ -211,6 +212,8 @@ contract BulleonCrowdsale is Claimable {
       return _amountInWei.mul(stageRate());
     }
 
+
+
     /**
      * @dev Switch contract to next stage and reset stage stats
      */
@@ -225,7 +228,7 @@ contract BulleonCrowdsale is Claimable {
     }
 
     function availableTokens() public view returns(uint256) {
-        return rewardToken.balanceOf(address(this)).sub(fundAmount());
+        return rewardToken.balanceOf(address(this));
     }
 
     function withdrawFunds(uint256 amount) internal {
@@ -245,37 +248,23 @@ contract BulleonCrowdsale is Claimable {
       );
       bonus = bonusAmount;
     }
-
-    function fundAmount() public view returns(uint256) {
-      return (now >= fundLifetime) ? 0 : amountAtFund;
-    }
-
-    function unlockReserve() public onlyOwner {
-      fundLifetime = 0; // Sets lifetime of fund to 0 = fund amount sets to 0
-    }
-
-    function sendTo(address beneficiary, uint256 amount) public onlyOwner {
-      // require(amount <= fundAmount()); // It's will be checked by SafeMath sub() require at next line.
-      // Check that fund have tokens to transfer
-      amountAtFund = fundAmount().sub(amount);
-      rewardToken.transfer(beneficiary, amount);
-    }
-
+    
     function getBonus() public view returns(uint256) {
       uint256 _bonus = bonus;
-      if(investmentsOf[msg.sender] >= 50 ether)
+      uint256 investments = investmentsOf[msg.sender];
+      if(investments >= 50 ether)
         _bonus = 500; // 50%
       else
-      if(investmentsOf[msg.sender]  >= 20 ether)
+      if(investments >= 20 ether)
         _bonus = 200; // 20%
       else
-      if(investmentsOf[msg.sender]  >= 10 ether)
+      if(investments  >= 10 ether)
         _bonus = 150; // 15%
       else
-      if(investmentsOf[msg.sender]  >= 5 ether)
+      if(investments  >= 5 ether)
         _bonus = 100; // 10%
       else
-      if(investmentsOf[msg.sender] >= 1 ether)
+      if(investments >= 1 ether)
         _bonus = 50; // 5%
 
       return _bonus;

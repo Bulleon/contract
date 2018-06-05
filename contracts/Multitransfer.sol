@@ -25,6 +25,7 @@ contract Multitransfer is Claimable {
      */
     constructor (address token, address _sender) public {
         sender = _sender;
+        BulleonAddress = token;
         bulleon = BulleonToken(token);
     }
 

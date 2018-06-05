@@ -17,12 +17,11 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
   string public constant name = "Bulleon"; /* solium-disable-line uppercase */
   string public constant symbol = "BUL"; /* solium-disable-line uppercase */
   uint8 public constant decimals = 18; /* solium-disable-line uppercase */
-  uint256 public constant totalSupply_ = 7970000 * (10 ** uint256(decimals));
-  uint256 constant exchangersBalance = 0;
+  uint256 constant exchangersBalance = 39991750231582759746295 + 14715165984103328399573 + 1846107707643607869274; // YoBit + Etherdelta + IDEX
 
   /* Premine and start balance settings */
-  address public premineWallet = 0x286BE9799488cA4543399c2ec964e7184077711C;
-  uint256 public premineAmount = 178420 * (10 ** uint256(decimals));
+  address constant premineWallet = 0x286BE9799488cA4543399c2ec964e7184077711C;
+  uint256 constant premineAmount = 178420 * (10 ** uint256(decimals));
 
   /* Additional params */
   address public CrowdsaleAddress;
@@ -33,6 +32,7 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
    * @dev Constructor that gives msg.sender all availabel of existing tokens.
    */
   constructor() public {
+    totalSupply_ = 7970000 * (10 ** uint256(decimals));
     balances[msg.sender] = totalSupply_;
     transfer(premineWallet, premineAmount.add(exchangersBalance));
 
@@ -55,6 +55,7 @@ contract BulleonToken is StandardBurnableToken, PausableToken, Claimable {
    * not actualy used
    */
   function pause() onlyOwner whenNotPaused public {
+    revert();
   }
 
   /**
